@@ -18,7 +18,7 @@
 
 
 
-## 二、类的介绍（逐步完善）
+## 二、主要类的介绍（逐步完善）
 
 ### 1.界面类
 
@@ -268,15 +268,64 @@ public class WorldBuilder {
 
 
 
-
-
 ### 3.生物类
 
+生物目前主要包括主角与蝙蝠兵：
 
 
-## 三、教程与细节
+
+### 4.AI类
+
+主要由基类CreatureAi以及他的派生类PlayerAi，BatAi等组成：
 
 
+### 4.物品类
+
+物品类目前主要包括血包❤，与葫芦娃（目前葫芦娃以类似于KEY的形式存在在地牢中，只要爷爷拾取到葫芦娃，即可将其加入队伍）。
+
+## 三、展示与细节
+
+展示视频发布在bilibili：
+
+展示描述：
+
+- 首先进入游戏，BGM响起，眼前的是PlayScreen欢迎你来到“爷爷救葫芦娃”这个游戏，“WELCOME TO THE GAME”，此时可以选择进行游戏，查看手册，或者退出游戏。
+
+  ![image-20211207021722568](C:\Users\huawei\AppData\Roaming\Typora\typora-user-images\image-20211207021722568.png)
+
+- 如果选择查看手册则进入手册界面，你可以形象的了解到游戏操作方法，怪物种类和规则。
+
+  ![image-20211207021825161](C:\Users\huawei\AppData\Roaming\Typora\typora-user-images\image-20211207021825161.png)
+
+- 选择继续游戏，进入Play界面：
+
+  蓝色小人为主角爷爷，下方左侧状态栏显示你的HP，得分，以及关卡难度（LEVEL），右侧显示队伍成员信息，暂时只有爷爷在队伍中，下方是提示信息。
+
+  ![image-20211207021928325](C:\Users\huawei\AppData\Roaming\Typora\typora-user-images\image-20211207021928325.png)
+
+- 你可以进行挖掘：
+
+  ![image-20211207022238856](C:\Users\huawei\AppData\Roaming\Typora\typora-user-images\image-20211207022238856.png)
+
+- 蝙蝠兵¥在你靠近时（设置的半径为6）将会主动攻击你，在远离时则随机游走。你可以攻击它们，他们也会攻击你：
+
+- ![image-20211207022559740](C:\Users\huawei\AppData\Roaming\Typora\typora-user-images\image-20211207022559740.png)
+
+  ![image-20211207022614352](C:\Users\huawei\AppData\Roaming\Typora\typora-user-images\image-20211207022614352.png)
+
+- 随时注意你的状态。绿色血量表示你还比较强壮，黄色则表示你可能要注意一下血量了，红色则代表你已经很虚弱了。
+
+  ![image-20211207022722431](C:\Users\huawei\AppData\Roaming\Typora\typora-user-images\image-20211207022722431.png)
+
+  ![image-20211207022814333](C:\Users\huawei\AppData\Roaming\Typora\typora-user-images\image-20211207022814333.png)
+
+  ![image-20211207022842728](C:\Users\huawei\AppData\Roaming\Typora\typora-user-images\image-20211207022842728.png)
+
+- 在杀死敌方单位后你会获得金币，而被地方杀死则会来到Lost界面，当然，你可以选择重头再来。
+
+  ![image-20211207023049559](C:\Users\huawei\AppData\Roaming\Typora\typora-user-images\image-20211207023049559.png)
+
+![image-20211207023123702](C:\Users\huawei\AppData\Roaming\Typora\typora-user-images\image-20211207023123702.png)
 
 
 

@@ -2,7 +2,6 @@ import myruguelike.screens.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
