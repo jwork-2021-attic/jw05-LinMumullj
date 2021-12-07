@@ -75,12 +75,35 @@
 ## 三、思考与总结
 
 **更新于2021/12/6：**
-	在这个阶段。实现了基本流畅的游戏运行，和较为好看的游戏界面。但由于时间和个人原因（最开始拖延了，最近一周事情又突然变多），很多东西没有完成，这里列出几点：
-	1.敌方的多线程。在研究我用的这套rugelike框架之前，我以为多线程非常好实现：首先将敌方单位的class实现runnable或者callable，来创建敌方单位。然后在界面里创建线程，或者用线程池来运行创建敌方任务的线程即可。但写到能运行的时候发现，不知道用哪个类来实现runnable了，而且run中的任务也没想明白。所以多线程留到最后一波冲了。
+	在这个阶段。实现了基本流畅的游戏运行，和较为好看的游戏界面。但由于时间和个人原因（最开始拖延了，最近一周事情又突然变多），很多东西待完善，这里列出几点：
+	1.**敌方的多线程**。在研究我用的这套rugelike框架之前，我以为多线程非常好实现：首先将敌方单位的class实现runnable或者callable，来创建敌方单位。然后在界面里创建线程，或者用线程池来运行创建敌方任务的线程即可。但写到能运行的时候发现，不知道用哪个类来实现runnable了，而且run中的任务也没想明白。
+	所以准确的来说我这个任务没有完成的很好，只是在Ai类里实现了Runnable，在工厂创建时调用线程来创建新的Ai：大概是这样：
 
-​	2.关卡跳转。虽然没能实现但有一个大概的思路。就是用playscreen中关卡标志来记录当前难度，在生成怪物或者涉及攻击防御等战斗因素时，用关卡难度来区别每一关。在救到葫芦娃之后，将救到的葫芦娃加入Team队列，然后更新关卡难度，重刷界面。再重刷界面时界面中的“LEVEL"和“Team menbers”也相应随记录的关卡标志和Team队列更新。
+```java
+public Creature newBat(PlayScreen plsc){
+	Creature bat = new Creature(world, (char)157, AsciiPanel.brightRed, 100, 5, 0,plsc);
+	world.addAtEmptyLocation(bat);
+	Thread t=new Thread(new BatAi(bat, plsc));
+	t.start();
+	//new BatAi(bat, plsc);
+	return bat;
+}
 
-​	3.敌方单位的智能算法。目前为了能够正常运行游戏，怪物的寻敌方式还是太简单了，准备下一次更新在网络上学习一些比较智能的算法。
+public Creature newEBat(Creature player,PlayScreen plsc){
+	Creature bat = new Creature(world, (char)157, AsciiPanel.brightMagenta, 150, 10, 0,plsc);
+	world.addAtEmptyLocation(bat);
+	Thread t=new Thread(new EBatAi(bat, player, plsc));
+	t.start();
+	//new EBatAi(bat, player, plsc);
+	return bat;
+}
+
+所以期末之前我需要再完善线程内容。
+```
+
+​	2.**关卡跳转**。虽然没能实现但有一个大概的思路。就是用playscreen中关卡标志来记录当前难度，在生成怪物或者涉及攻击防御等战斗因素时，用关卡难度来区别每一关。在救到葫芦娃之后，将救到的葫芦娃加入Team队列，然后更新关卡难度，重刷界面。再重刷界面时界面中的“LEVEL"和“Team menbers”也相应随记录的关卡标志和Team队列更新。
+
+​	3.**敌方移动的智能算法**。目前为了能够正常运行游戏，怪物的寻敌方式还是太简单了，准备下一次更新在网络上学习一些比较智能的算法。
 
 **最大的收获：**
 

@@ -21,14 +21,18 @@ public class CreatureFactory{
 	public Creature newBat(PlayScreen plsc){
 		Creature bat = new Creature(world, (char)157, AsciiPanel.brightRed, 100, 5, 0,plsc);
 		world.addAtEmptyLocation(bat);
-		new BatAi(bat, plsc);
+		Thread t=new Thread(new BatAi(bat, plsc));
+		t.start();
+		//new BatAi(bat, plsc);
 		return bat;
 	}
 
 	public Creature newEBat(Creature player,PlayScreen plsc){
 		Creature bat = new Creature(world, (char)157, AsciiPanel.brightMagenta, 150, 10, 0,plsc);
 		world.addAtEmptyLocation(bat);
-		new EBatAi(bat, player, plsc);
+		Thread t=new Thread(new EBatAi(bat, player, plsc));
+		t.start();
+		//new EBatAi(bat, player, plsc);
 		return bat;
 	}
 

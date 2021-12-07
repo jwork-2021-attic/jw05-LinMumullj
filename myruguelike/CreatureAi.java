@@ -2,7 +2,7 @@ package myruguelike;
 
 import myruguelike.screens.PlayScreen;
 
-public class CreatureAi {
+public class CreatureAi implements Runnable{
 	protected Creature creature;
 	PlayScreen playscreen;
 	public CreatureAi(Creature creature,PlayScreen plsc){
@@ -42,5 +42,9 @@ public class CreatureAi {
 		// if (creature.world.tile(creature.x+mx, creature.y+my).isGround()) 
 		// 	creature.moveBy(mx, my);
 		
+	}
+	@Override
+	public void run() {
+		onUpdate();
 	}
 }
