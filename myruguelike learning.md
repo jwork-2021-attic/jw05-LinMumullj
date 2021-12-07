@@ -1,6 +1,8 @@
-# 						**myruguelike learning**
+# 												**myruguelike learning**
 
-## 																	————from the day one
+## 																																						————from the day one
+
+**12/7版** 未完待续
 
 **191220059  林龙杰**
 
@@ -85,7 +87,153 @@ public class WinScreen implements Screen {
 
 d.PlayScreen类
 
-```
+```java
+public class PlayScreen implements Screen {
+	private World world;
+	private Creature player;
+	private int screenWidth;
+	private int screenHeight;
+	private List<String> messages;
+	private int score;
+	private int level;
+	public boolean iswin;
+	public boolean ispause;
+	public PlayScreen(){
+		score=0;
+		level=1;
+		screenWidth = 80;
+		screenHeight = 23;
+		iswin=false;
+		ispause=false;
+		messages = new ArrayList<String>();
+		createWorld();
+		
+		CreatureFactory creatureFactory = new CreatureFactory(world);
+		createCreatures(creatureFactory);
+	}
+	
+    
+    //在这里调用工厂来创建你想要的生物
+	private void createCreatures(CreatureFactory creatureFactory){
+		player = creatureFactory.newPlayer(messages,this);  //将消息列表传递给playerAI
+		
+		for (int i = 0; i < 10; i++){
+			creatureFactory.newBat(this);
+		}
+		for (int i = 0; i < 30; i++){
+			creatureFactory.newEBat(player,this);
+		}
+		for (int i = 0; i < 10; i++){
+			creatureFactory.newHeart();
+		}
+		creatureFactory.newGourd();
+	}
+	
+	private void createWorld(){
+		//90 32
+		world = new WorldBuilder(200, 170).makeCaves().build();
+		//world = new WorldBuilder(90, 30).makeCaves().build();
+	}
+	//取打印左上角x，若当前Screen没有碰右下角，且不没有碰左上角，则返回当前Screen左上角x
+	public int getScrollX() { return Math.max(0, Math.min(player.x - screenWidth / 2, world.width() - screenWidth)); }
+	//取打印左上角y，同上
+	public int getScrollY() { return Math.max(0, Math.min(player.y - screenHeight / 2, world.height() - screenHeight)); }
+	
+    
+    //在这里打印所有细节，比如得分，难度等级
+	@Override
+	public void displayOutput(AsciiPanel terminal) {
+		int left = getScrollX();
+		int top = getScrollY(); 
+		
+		displayTiles(terminal, left, top);
+		displayMessages(terminal, messages);
+		
+		terminal.writeCenter("-- press [Esc] to back --", 26);
+
+		String stats = String.format("HP: %3d/%3d", player.hp(), player.maxHp());
+		if(player.hp()>70)
+		{
+			terminal.write(stats, 1, 24,AsciiPanel.green);
+		}
+		else if(player.hp()<=70&&player.hp()>40)
+		{
+			terminal.write(stats, 1, 24,AsciiPanel.yellow);
+		}
+		else
+		{
+			terminal.write(stats, 1, 24,AsciiPanel.red);
+		}
+
+		score=world.score;
+		String stats2 = String.format("SCORE: %d", score);
+		terminal.write(stats2,1,25,AsciiPanel.brightYellow);
+		String stats3 = String.format("LEVEL: %d", level);
+		terminal.write(stats3,1,26);
+
+		terminal.write("Team members: ",64,24);
+		terminal.write((char)2,64,26,AsciiPanel.brightCyan);
+	}
+
+	private void displayMessages(AsciiPanel terminal, List<String> messages) {
+		int top = screenHeight - messages.size();
+		for (int i = 0; i < messages.size(); i++){
+			//terminal.writeCenter(messages.get(i), top + i);
+			terminal.writeCenter(messages.get(i), top);
+		}
+		messages.clear();
+	}
+
+    
+	private void displayTiles(AsciiPanel terminal, int left, int top) {
+		for (int x = 0; x < screenWidth; x++){
+			for (int y = 0; y < screenHeight; y++){
+				int wx = x + left;
+				int wy = y + top;
+
+				Creature creature = world.creature(wx, wy);
+
+				//生物存在creature里，非生物（tile，floor）直接可用world中方法获取。
+				if (creature != null)
+					terminal.write(creature.glyph(), creature.x - left, creature.y - top, creature.color());
+				else
+					terminal.write(world.glyph(wx, wy), x, y, world.color(wx, wy));
+			}
+		}
+	}
+	
+   	//回合制，相应键盘后判断是否胜利，是否死亡。
+	@Override
+	public Screen respondToUserInput(KeyEvent key) {
+		switch (key.getKeyCode()){
+		case KeyEvent.VK_ESCAPE: return new StartScreen();
+		
+		case KeyEvent.VK_UP:player.moveBy( 0,-1); break;
+		case KeyEvent.VK_DOWN:player.moveBy( 0, 1); break;
+		case KeyEvent.VK_LEFT:player.moveBy(-1, 0); break;
+		case KeyEvent.VK_RIGHT:player.moveBy( 1, 0); break;
+
+		}
+		// if(ispause==false&&key.getKeyCode()==KeyEvent.VK_SPACE)
+		// {
+		// }
+		//每次按键响应后，更新一次世界
+		world.update();
+		if(iswin==true)
+			return new WinScreen();
+		if (player.hp() < 1)
+			return new LoseScreen();
+		
+		return this;
+	}
+//检查是否胜利，写了没调。。
+	public Screen checkwin()
+	{
+		if(iswin==true)
+			return new WinScreen();
+		return this;
+	}
+}
 
 ```
 
@@ -274,7 +422,108 @@ public class WorldBuilder {
 
 ### 3.生物类
 
-生物目前主要包括主角与蝙蝠兵：
+生物类是一切生物的基础，不同生物的不同特性区别于他们的Ai不同。
+
+```java
+public class Creature {
+	public World world;
+	public PlayScreen playscreen;
+	public int x;
+	public int y;
+	
+	private char glyph;
+	public char glyph() { return glyph; }
+	......
+    //这里调用Ai中的行走，不同的生物的Ai对于行走有不同的操作，比如player就会拾取当前位置的血包等等。
+	public void moveBy(int mx, int my){
+
+		if(mx==0&&my==0)
+			return;
+		
+		Creature other = world.creature(x+mx, y+my);
+		
+		if (other == null)
+		{
+			if(world.item(x+mx, y+my)==null)
+				ai.onEnter(x+mx, y+my, world.tile(x+mx, y+my),world.item(x+mx, y+my));
+			else
+			{
+				// world.removeitem(x+mx, y+my);
+				// if(hp>=90)
+				// 	hp=100;
+				// else
+				// 	hp+=10;
+				ai.onEnter(x+mx, y+my, world.tile(x+mx, y+my),world.item(x+mx, y+my));
+			}
+		}
+		else
+			attack(other);
+	}
+
+	......
+        
+	public void attack(Creature other){
+		int atkva = Math.max(0, attackValue() - other.defenseValue())+1;
+		doAction("attack the '%s' for %d hp", other.glyph, atkva);
+		
+		other.changeHp(-atkva);
+	}
+
+	public void changeHp(int amount) { 
+		hp += amount;
+		if(hp>100)
+			hp=100;
+		if (hp < 1) {
+			doAction("painfully die");
+			world.score+=10;
+			world.remove(this);
+		}
+	}
+	
+	public void dig(int wx, int wy) {
+		world.dig(wx, wy);
+		doAction("dig a hole");
+	}
+	
+	public void update(){
+		ai.onUpdate();
+	}
+
+	public boolean canSee(int wx, int wy){
+		return ai.canSee(wx, wy);
+	}
+
+	public boolean canEnter(int wx, int wy) {
+		return world.tile(wx, wy).isGround() && world.creature(wx, wy) == null;
+	}
+
+	public void notify(String message, Object ... params){
+		ai.onNotify(String.format(message, params));
+	}
+	//这个函数十分重要，在执行动作时生物需要通知到附近的人，从而在屏幕上打印出动作的信息
+	public void doAction(String message, Object ... params){
+		int r = 10;  //响应半径
+		for (int ox = -r; ox < r+1; ox++){
+			for (int oy = -r; oy < r+1; oy++){
+				if (ox*ox + oy*oy > r*r)
+					continue;
+				
+				Creature other = world.creature(x+ox, y+oy);
+				
+				if (other == null)
+					continue;
+				
+				if (other == this)
+					other.notify("You " + message + ".", params);
+				else if(other.canSee(x, y))
+					other.notify(String.format("The '%s' %s.", glyph, makeSecondPerson(message)), params);
+			}
+		}
+	}
+	......
+}
+
+```
 
 
 
@@ -282,55 +531,192 @@ public class WorldBuilder {
 
 主要由基类CreatureAi以及他的派生类PlayerAi，BatAi等组成：
 
+其中onEnter为走路函数。playerAi中override它时，实现走路拾取血包加血，拾取葫芦娃过关等操作。
+
+canSee判断是否被地方发现。**只要接近敌方半径为8就被发现。**
+
+wander为地方随机巡逻函数，**向周围的地板随机行走。**
+
+```java
+public class CreatureAi {
+	protected Creature creature;
+	PlayScreen playscreen;
+	public CreatureAi(Creature creature,PlayScreen plsc){
+		this.creature = creature;
+		this.creature.setCreatureAi(this);
+		this.playscreen=plsc;
+	}
+	
+	public void onEnter(int x, int y, Tile tile, Items item){
+		if (tile.isGround()){
+			creature.x = x;
+			creature.y = y;
+		}
+		//
+	}
+	
+	public void onUpdate(){
+	}
+	
+	public boolean canSee(int wx, int wy) {
+
+		if ((creature.x-wx)<8&&(creature.y-wy)<8)
+			return true;
+
+		return false;
+	}
+
+	public void onNotify(String message){
+	}
+	public void wander(){
+		int mx = (int)(Math.random() * 3) - 1;
+		int my = (int)(Math.random() * 3) - 1;
+		if (!creature.tile(creature.x+mx, creature.y+my).isGround())
+			return;
+		else
+			creature.moveBy(mx, my);
+		// if (creature.world.tile(creature.x+mx, creature.y+my).isGround()) 
+		// 	creature.moveBy(mx, my);
+		
+	}
+}
+
+```
+
+```java
+//玩家的ONENTER
+public void onEnter(int x, int y, Tile tile, Items item){
+		if (tile.isGround()){
+			if(item == Items.GOURD)
+			{
+				this.creature.world.removeitem(x, y);
+				this.playscreen.iswin=true;
+			}
+			else if(item == Items.HEART)
+			{
+				this.creature.changeHp(10);
+				this.creature.world.removeitem(x, y);
+			}
+			creature.x = x;
+			creature.y = y;
+
+		} else if (tile.isDiggable()) {
+			creature.dig(x, y);
+		}
+	}
+```
+
+
 
 ### 4.物品类
 
+物品类是一个枚举类：包括所有可以拾取的东西。
+
 物品类目前主要包括血包❤，与葫芦娃（目前葫芦娃以类似于KEY的形式存在在地牢中，只要爷爷拾取到葫芦娃，即可将其加入队伍）。
+
+```java
+public enum Items {
+	HEART((char)3, AsciiPanel.brightGreen, "heart" ,10),
+	GOURD((char)2, AsciiPanel.brightBlue, "gourd1" ,10);
+
+
+    public PlayScreen playscreen;
+    public int x;
+    public int y;
+    private char glyph;
+	public char glyph() { return glyph; }
+	
+	private Color color;
+	public Color color() { return color; }
+
+	private String itemname;
+	public String getname() { return itemname; }
+	
+	private int hpvalue;
+	public int getHpvalue() { return hpvalue; }
+
+
+    Items(char glyph, Color color, String itemname,int hpvalue){
+		this.glyph = glyph;
+		this.color = color;
+		this.itemname = itemname;
+        this.hpvalue=hpvalue;
+		this.x=0;
+		this.y=0;
+	}
+    public void setScreen(PlayScreen playscreen)
+	{
+		this.playscreen=playscreen;
+	}
+}
+```
+
+
 
 ## 三、展示与细节
 
-展示视频发布在bilibili：
+展示视频发布在bilibili：https://www.bilibili.com/video/BV18Z4y197vr?share_source=copy_web
 
 展示描述：
 
 - 首先进入游戏，BGM响起，眼前的是PlayScreen欢迎你来到“爷爷救葫芦娃”这个游戏，“WELCOME TO THE GAME”，此时可以选择进行游戏，查看手册，或者退出游戏。
 
-  ![image-20211207021722568](C:\Users\huawei\AppData\Roaming\Typora\typora-user-images\image-20211207021722568.png)
+- ![image-20211207021722568](resources/image-20211207021722568.png)
 
 - 如果选择查看手册则进入手册界面，你可以形象的了解到游戏操作方法，怪物种类和规则。
 
-  ![image-20211207021825161](C:\Users\huawei\AppData\Roaming\Typora\typora-user-images\image-20211207021825161.png)
+  ![image-20211207021825161](resources/image-20211207021825161.png)
 
 - 选择继续游戏，进入Play界面：
 
   蓝色小人为主角爷爷，下方左侧状态栏显示你的HP，得分，以及关卡难度（LEVEL），右侧显示队伍成员信息，暂时只有爷爷在队伍中，下方是提示信息。
 
-  ![image-20211207021928325](C:\Users\huawei\AppData\Roaming\Typora\typora-user-images\image-20211207021928325.png)
+  ![image-20211207021928325](resources/image-20211207021928325.png)
 
 - 你可以进行挖掘：
 
-  ![image-20211207022238856](C:\Users\huawei\AppData\Roaming\Typora\typora-user-images\image-20211207022238856.png)
+  ![image-20211207022238856](resources/image-20211207022238856.png)
 
 - 蝙蝠兵¥在你靠近时（设置的半径为6）将会主动攻击你，在远离时则随机游走。你可以攻击它们，他们也会攻击你：
 
-- ![image-20211207022559740](C:\Users\huawei\AppData\Roaming\Typora\typora-user-images\image-20211207022559740.png)
+- ![image-20211207022559740](resources/image-20211207022559740.png)
 
-  ![image-20211207022614352](C:\Users\huawei\AppData\Roaming\Typora\typora-user-images\image-20211207022614352.png)
+  ![image-20211207022614352](resources/image-20211207022614352.png)
 
 - 随时注意你的状态。绿色血量表示你还比较强壮，黄色则表示你可能要注意一下血量了，红色则代表你已经很虚弱了。
 
-  ![image-20211207022722431](C:\Users\huawei\AppData\Roaming\Typora\typora-user-images\image-20211207022722431.png)
+  ![image-20211207022722431](resources/image-20211207022722431.png)
 
-  ![image-20211207022814333](C:\Users\huawei\AppData\Roaming\Typora\typora-user-images\image-20211207022814333.png)
+  ![image-20211207022814333](resources/image-20211207022814333.png)
 
-  ![image-20211207022842728](C:\Users\huawei\AppData\Roaming\Typora\typora-user-images\image-20211207022842728.png)
+  ![image-20211207022842728](resources/image-20211207022842728.png)
 
 - 在杀死敌方单位后你会获得金币，而被地方杀死则会来到Lost界面，当然，你可以选择重头再来。
 
-  ![image-20211207023049559](C:\Users\huawei\AppData\Roaming\Typora\typora-user-images\image-20211207023049559.png)
+  ![image-20211207023049559](resources/image-20211207023049559.png)
 
-![image-20211207023123702](C:\Users\huawei\AppData\Roaming\Typora\typora-user-images\image-20211207023123702.png)
+![image-20211207023123702](resources/image-20211207023123702.png)
 
+- 在找到本层的葫芦娃后会跳转到下一层（暂未实现关卡）
 
+  ![image-20211207135211799](resources/image-20211207135211799.png)
+
+  ![image-20211207135244289](resources/image-20211207135244289.png)
 
 ## 四、思考与总结
+
+**更新于2021/12/6：**
+	在这个阶段。实现了基本流畅的游戏运行，和较为好看的游戏界面。但由于时间和个人原因（最开始拖延了，最近一周事情又突然变多），很多东西没有完成，这里列出几点：
+	1.敌方的多线程。在研究我用的这套rugelike框架之前，我以为多线程非常好实现：首先将敌方单位的class实现runnable或者callable，来创建敌方单位。然后在界面里创建线程，或者用线程池来运行创建敌方任务的线程即可。但写到差不多的时候发现，不知道应该哪个类来实现runnable了，而且run的任务，我也越想越糊涂。所以在12/7之前我没能实现这个。
+
+​	2.关卡跳转。虽然没能实现但有一个大概的思路。就是用playscreen中关卡标志来记录当前难度，在生成怪物或者涉及攻击防御等战斗因素时，用关卡难度来区别每一关。在救到葫芦娃之后，将救到的葫芦娃加入Team队列，然后更新关卡难度，重刷界面。再重刷界面时界面中的“LEVEL"和“Team menbers”也相应随记录的关卡标志和Team队列更新。
+
+​	3.敌方单位的智能算法。目前为了能够正常运行游戏，怪物的寻敌方式还是太简单了，准备下一次更新在网络上学习一些比较智能的算法。
+
+**最大的收获：**
+
+​	在这次游戏的debug中，没想到最大的收获感觉是对于类中函数参数的理解加深了。打个比方。在我用的jw04的这个ruguelike框架中，最外层是入口类Begin继承JFrame，其中包含界面screen和terminal。在对screen进行操作时，是每次将terminal作为参数传入的，所以如果在screen中想对terminal进行操作只能通过相应函数。虽然这体现了面向对象的封装但有的时候感觉还是好麻烦。果然方便和安全性是不可兼得的。
+
+​	再比如Creature类和CreatureAi类是互相绑定的，在他们的构造函数中他们就通过传入参数绑定了彼此，这种互相绑定就可以是他们作为彼此的成员，互相调用，简化了好多操作。
+
+​	期末将至希望能30号之前最后冲一波，不挂科o(╥﹏╥)o

@@ -45,5 +45,4 @@ public class CreatureFactory{
 		world.addAtEmptyLocation(item);
 		return item;
 	}
-	
 }
