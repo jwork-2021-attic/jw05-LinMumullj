@@ -111,6 +111,8 @@ public class Begin extends JFrame implements KeyListener {
 	
 	public static void main(String[] args) {
 		Begin app = new Begin();
+		app.setTitle("GRANDPA SAVES GOURD BABIES");
+		app.setLocationRelativeTo(null);
 		app.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		app.setVisible(true);
 		// playMusic();

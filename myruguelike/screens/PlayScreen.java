@@ -18,11 +18,15 @@ public class PlayScreen implements Screen {
 	private List<String> messages;
 	private int score;
 	private int level;
+	public boolean iswin;
+	public boolean ispause;
 	public PlayScreen(){
 		score=0;
 		level=1;
 		screenWidth = 80;
 		screenHeight = 23;
+		iswin=false;
+		ispause=false;
 		messages = new ArrayList<String>();
 		createWorld();
 		
@@ -31,17 +35,18 @@ public class PlayScreen implements Screen {
 	}
 	
 	private void createCreatures(CreatureFactory creatureFactory){
-		player = creatureFactory.newPlayer(messages);  //将消息列表传递给playerAI
+		player = creatureFactory.newPlayer(messages,this);  //将消息列表传递给playerAI
 		
-		for (int i = 0; i < 2; i++){
-			creatureFactory.newBat();
+		for (int i = 0; i < 10; i++){
+			creatureFactory.newBat(this);
 		}
-		for (int i = 0; i < 22; i++){
-			creatureFactory.newEBat(player);
+		for (int i = 0; i < 30; i++){
+			creatureFactory.newEBat(player,this);
 		}
-		for (int i = 0; i < 2; i++){
+		for (int i = 0; i < 10; i++){
 			creatureFactory.newHeart();
 		}
+		creatureFactory.newGourd();
 	}
 	
 	private void createWorld(){
@@ -125,11 +130,23 @@ public class PlayScreen implements Screen {
 		case KeyEvent.VK_RIGHT:player.moveBy( 1, 0); break;
 
 		}
+		// if(ispause==false&&key.getKeyCode()==KeyEvent.VK_SPACE)
+		// {
+		// }
 		//每次按键响应后，更新一次世界
 		world.update();
+		if(iswin==true)
+			return new WinScreen();
 		if (player.hp() < 1)
 			return new LoseScreen();
 		
+		return this;
+	}
+
+	public Screen checkwin()
+	{
+		if(iswin==true)
+			return new WinScreen();
 		return this;
 	}
 }

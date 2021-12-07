@@ -1,6 +1,8 @@
 package myruguelike;
 
 import java.awt.Color;
+import java.util.Random;
+
 import asciiPanel.AsciiPanel;
 
 public enum Tile {
@@ -10,6 +12,8 @@ public enum Tile {
 	WALL((char)216, AsciiPanel.red),
 	BOUNDS('x', AsciiPanel.brightBlack);
 	
+	public boolean isdiggable;
+
 	private char glyph;
 	public char glyph() { return glyph; }
 	
@@ -19,6 +23,7 @@ public enum Tile {
 	Tile(char glyph, Color color){
 		this.glyph = glyph;
 		this.color = color;
+		this.isdiggable=true;
 	}
 
 	public boolean isGround() {
@@ -26,6 +31,6 @@ public enum Tile {
 	}
 
 	public boolean isDiggable() {
-		return this == Tile.WALL;
+		return(this == Tile.WALL);
 	}
 }

@@ -1,11 +1,12 @@
 package myruguelike;
 
+import myruguelike.screens.PlayScreen;
 
 public class EBatAi extends CreatureAi {
 	private Creature player;
 	
-	public EBatAi(Creature creature, Creature player) {
-		super(creature);
+	public EBatAi(Creature creature, Creature player, PlayScreen plsc) {
+		super(creature,plsc);
 		this.player = player;
 	}
 

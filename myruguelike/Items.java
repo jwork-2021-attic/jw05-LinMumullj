@@ -1,7 +1,12 @@
 package myruguelike;
 import java.awt.Color;
+import asciiPanel.AsciiPanel;
 import myruguelike.screens.PlayScreen;
-public class Items {
+public enum Items {
+	HEART((char)3, AsciiPanel.brightGreen, "heart" ,10),
+	GOURD((char)2, AsciiPanel.brightBlue, "gourd1" ,10);
+
+
     public PlayScreen playscreen;
     public int x;
     public int y;
@@ -11,20 +16,20 @@ public class Items {
 	private Color color;
 	public Color color() { return color; }
 
-	private String name;
-	public String name() { return name; }
+	private String itemname;
+	public String getname() { return itemname; }
 	
 	private int hpvalue;
 	public int getHpvalue() { return hpvalue; }
 
 
-    public Items(char glyph, Color color, String name,int hpvalue){
+    Items(char glyph, Color color, String itemname,int hpvalue){
 		this.glyph = glyph;
 		this.color = color;
-		this.name = name;
+		this.itemname = itemname;
         this.hpvalue=hpvalue;
-        this.x=0;
-        this.y=0;
+		this.x=0;
+		this.y=0;
 	}
     public void setScreen(PlayScreen playscreen)
 	{

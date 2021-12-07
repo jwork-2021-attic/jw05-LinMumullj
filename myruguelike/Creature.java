@@ -34,7 +34,7 @@ public class Creature {
 	private int defenseValue;
 	public int defenseValue() { return defenseValue; }
 	
-	public Creature(World world, char glyph, Color color, int maxHp, int attack, int defense){
+	public Creature(World world, char glyph, Color color, int maxHp, int attack, int defense,PlayScreen plsc){
 		this.world = world;
 		this.glyph = glyph;
 		this.color = color;
@@ -42,6 +42,7 @@ public class Creature {
 		this.hp = maxHp;
 		this.attackValue = attack;
 		this.defenseValue = defense;
+		this.playscreen=plsc;
 	}
 	public void setScreen(PlayScreen playscreen)
 	{
@@ -58,15 +59,15 @@ public class Creature {
 		if (other == null)
 		{
 			if(world.item(x+mx, y+my)==null)
-				ai.onEnter(x+mx, y+my, world.tile(x+mx, y+my));
+				ai.onEnter(x+mx, y+my, world.tile(x+mx, y+my),world.item(x+mx, y+my));
 			else
 			{
-				world.removeitem(x+mx, y+my);
-				if(hp>=90)
-					hp=100;
-				else
-					hp+=10;
-				ai.onEnter(x+mx, y+my, world.tile(x+mx, y+my));
+				// world.removeitem(x+mx, y+my);
+				// if(hp>=90)
+				// 	hp=100;
+				// else
+				// 	hp+=10;
+				ai.onEnter(x+mx, y+my, world.tile(x+mx, y+my),world.item(x+mx, y+my));
 			}
 		}
 		else
@@ -82,16 +83,17 @@ public class Creature {
 
 	public void attack(Creature other){
 		int atkva = Math.max(0, attackValue() - other.defenseValue())+1;
-		doAction("attack the '%s' for %d damage", other.glyph, atkva);
+		doAction("attack the '%s' for %d hp", other.glyph, atkva);
 		
 		other.changeHp(-atkva);
 	}
 
 	public void changeHp(int amount) { 
 		hp += amount;
-		
+		if(hp>100)
+			hp=100;
 		if (hp < 1) {
-			doAction("die");
+			doAction("painfully die");
 			world.score+=10;
 			world.remove(this);
 		}
@@ -99,7 +101,7 @@ public class Creature {
 	
 	public void dig(int wx, int wy) {
 		world.dig(wx, wy);
-		doAction("dig");
+		doAction("dig a hole");
 	}
 	
 	public void update(){

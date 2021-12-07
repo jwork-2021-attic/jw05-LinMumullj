@@ -1,5 +1,5 @@
 package myruguelike;
-
+import java.util.Random;
 public class WorldBuilder {
 	private int width;
 	private int height;
@@ -16,9 +16,21 @@ public class WorldBuilder {
 	}
 
 	private WorldBuilder randomizeTiles() {
+		// Random rd=new Random();
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
-				tiles[x][y] = Math.random() < 0.5 ? Tile.FLOOR : Tile.WALL;
+				//tiles[x][y] = Math.random() < 0.5 ? Tile.FLOOR : Tile.WALL;
+
+				if(Math.random()<0.5)
+				{
+					tiles[x][y]=Tile.FLOOR;
+				}
+				else
+				{
+					tiles[x][y]=Tile.WALL;
+					// int tmp=rd.nextInt(10);
+					// tiles[x][y].isdiggable=tmp < 5 ? true:false;
+				}
 			}
 		}
 		return this;

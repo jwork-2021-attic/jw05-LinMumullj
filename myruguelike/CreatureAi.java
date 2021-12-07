@@ -1,14 +1,17 @@
 package myruguelike;
 
+import myruguelike.screens.PlayScreen;
+
 public class CreatureAi {
 	protected Creature creature;
-	
-	public CreatureAi(Creature creature){
+	PlayScreen playscreen;
+	public CreatureAi(Creature creature,PlayScreen plsc){
 		this.creature = creature;
 		this.creature.setCreatureAi(this);
+		this.playscreen=plsc;
 	}
 	
-	public void onEnter(int x, int y, Tile tile){
+	public void onEnter(int x, int y, Tile tile, Items item){
 		if (tile.isGround()){
 			creature.x = x;
 			creature.y = y;
