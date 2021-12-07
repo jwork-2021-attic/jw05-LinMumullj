@@ -22,6 +22,97 @@
 
 ## 二、主要类的介绍（待完善）
 
+### **0.入口类**
+
+集成JFrame框架，重写了repaint等主要函数，学习了一下播放音乐的方法用musicStuff类包含，main函数中设置JFrame的窗口名字，窗口位置等等参数。进入游戏。
+
+```java
+public class Begin extends JFrame implements KeyListener {
+	private static final long serialVersionUID = 191220059L;
+	
+	private AsciiPanel terminal;
+	private Screen screen;
+	
+    //实现背景音乐播放
+	public class musicStuff {
+		void playMusic(String musicLocation)
+		{
+			try
+			{
+				File musicPath = new File(musicLocation);
+				
+				if(musicPath.exists())
+				{
+					AudioInputStream audioInput = AudioSystem.getAudioInputStream(musicPath);
+					Clip clip = AudioSystem.getClip();
+					clip.open(audioInput);
+					clip.start();
+					clip.loop(Clip.LOOP_CONTINUOUSLY);
+				}
+				else
+				{
+					
+				}
+			}
+			catch(Exception ex)
+			{
+				ex.printStackTrace();
+			}
+		}
+	
+	}
+	musicStuff musicObject;
+	public Begin(){
+		super();
+		terminal = new AsciiPanel(80,28,AsciiFont.TALRYTH_15_15);
+		add(terminal);
+		pack();
+		screen = new StartScreen();
+		addKeyListener(this);
+		repaint();
+		musicObject = new musicStuff();
+	}
+	
+
+	@Override
+	public void repaint(){
+		terminal.clear();
+		screen.displayOutput(terminal);
+		super.repaint();
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		screen = screen.respondToUserInput(e);
+		if(screen == null)
+		{
+			this.dispose();
+			System.exit(0);
+		}
+		repaint();
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) { }
+
+	@Override
+	public void keyTyped(KeyEvent e) { }
+	
+	public static void main(String[] args) {
+		Begin app = new Begin();
+		app.setTitle("GRANDPA SAVES GOURD BABIES");
+		app.setLocationRelativeTo(null);
+		app.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		app.setVisible(true);
+		// playMusic();
+		String filepath = "resources/Title.wav";
+		app.musicObject.playMusic(filepath);
+	}
+}
+```
+
+
+
 ### 1.界面类
 
 a.Screen接口类
