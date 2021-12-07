@@ -59,7 +59,7 @@ public class Creature {
 		if (other == null)
 		{
 			if(world.item(x+mx, y+my)==null)
-				ai.onEnter(x+mx, y+my, world.tile(x+mx, y+my),world.item(x+mx, y+my));
+				ai.go(x+mx, y+my, world.tile(x+mx, y+my),world.item(x+mx, y+my));
 			else
 			{
 				// world.removeitem(x+mx, y+my);
@@ -67,7 +67,7 @@ public class Creature {
 				// 	hp=100;
 				// else
 				// 	hp+=10;
-				ai.onEnter(x+mx, y+my, world.tile(x+mx, y+my),world.item(x+mx, y+my));
+				ai.go(x+mx, y+my, world.tile(x+mx, y+my),world.item(x+mx, y+my));
 			}
 		}
 		else

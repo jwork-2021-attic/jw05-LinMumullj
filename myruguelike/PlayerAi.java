@@ -13,7 +13,7 @@ public class PlayerAi extends CreatureAi {
 		this.messages = messages;
 	}
 
-	public void onEnter(int x, int y, Tile tile, Items item){
+	public void go(int x, int y, Tile tile, Items item){
 		if (tile.isGround()){
 			if(item == Items.GOURD)
 			{

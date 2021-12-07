@@ -11,7 +11,7 @@ public class CreatureAi {
 		this.playscreen=plsc;
 	}
 	
-	public void onEnter(int x, int y, Tile tile, Items item){
+	public void go(int x, int y, Tile tile, Items item){
 		if (tile.isGround()){
 			creature.x = x;
 			creature.y = y;
