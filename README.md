@@ -8,7 +8,7 @@
 
 ## 一、游戏构思
 
-在jw04的作业中，了解到ruguelike的历史背景。以及一些经典的地牢算法，比如地牢的随机生成算法————通过多次smooth地砖与墙壁来随机构造地牢，还有一些其他知识也引起了我很大的兴趣。在jw05中将要求实现一个地牢游戏，这对于我来说是一个大挑战。所以我初步构想，先沿用jw04提供的地牢框架，来简易实现一按键触发的爷爷救葫芦娃的rugulike。然后进行优化，从单一作战方式到近远程多武器作战；从单一道具拾取到多种类；从单一敌人模式到多种类。
+在jw04的作业中，了解到ruguelike的历史背景。以及一些经典的地牢算法，比如地牢的随机生成算法————通过多次smooth地砖与墙壁来随机构造地牢，还有一些其他知识也引起了我很大的兴趣。在jw05中将要求实现一个地牢游戏，这对于我来说是一个大挑战。所以我初步构想，先沿用jw04提供的地牢框架，来简易实现一按键触发的爷爷救葫芦娃的rugulike。然后进行优化，从单一作战方式到近远程多武器作战；从单一道具拾取到多种类；从单一敌人模式到多种类。在jw06,07中分别加入进度储存和测试。
 
 ### 1.规则构思
 
@@ -72,12 +72,20 @@
 
   ![image-20211207135244289](resources/image-20211207135244289.png)
 
+
+
+**12/31版本更新：**
+
+增加进度存储功能，可以在退出游戏后进入之前保存的存档。
+
+
 ## 三、思考与总结
 
-**更新于2021/12/6：**
-	在这个阶段。实现了基本流畅的游戏运行，和较为好看的游戏界面。但由于时间和个人原因（最开始拖延了，最近一周事情又突然变多），很多东西待完善，这里列出几点：
-	1.**敌方的多线程**。在研究我用的这套rugelike框架之前，我以为多线程非常好实现：首先将敌方单位的class实现runnable或者callable，来创建敌方单位。然后在界面里创建线程，或者用线程池来运行创建敌方任务的线程即可。但写到能运行的时候发现，不知道用哪个类来实现runnable了，而且run中的任务也没想明白。
-	所以准确的来说我这个任务没有完成的很好，只是在Ai类里实现了Runnable，在工厂创建时调用线程来创建新的Ai：大概是这样：
+#### **2021/12/6版本：**
+
+​	在这个阶段。实现了基本流畅的游戏运行，和较为好看的游戏界面。但由于时间和个人原因（最开始拖延了，最近一周事情又突然变多），很多东西待完善，这里列出几点：
+​	1.**敌方的多线程**。在研究我用的这套rugelike框架之前，我以为多线程非常好实现：首先将敌方单位的class实现runnable或者callable，来创建敌方单位。然后在界面里创建线程，或者用线程池来运行创建敌方任务的线程即可。但写到能运行的时候发现，不知道用哪个类来实现runnable了，而且run中的任务也没想明白。
+​	所以准确的来说我这个任务没有完成的很好，只是在Ai类里实现了Runnable，在工厂创建时调用线程来创建新的Ai：大概是这样：
 
 ```java
 public Creature newBat(PlayScreen plsc){
@@ -110,6 +118,113 @@ public Creature newEBat(Creature player,PlayScreen plsc){
 ​	在这次游戏的debug中，没想到最大的收获感觉是对于类中函数参数的理解加深了。打个比方。在我用的jw04的这个ruguelike框架中，最外层是入口类Begin继承JFrame，其中包含界面screen和terminal。在对screen进行操作时，是每次将terminal作为参数传入的，所以如果在screen中想对terminal进行操作只能通过相应函数。虽然这体现了面向对象的封装但有的时候感觉还是好麻烦。果然方便和安全性是不可兼得的。
 
 ​	再比如Creature类和CreatureAi类是互相绑定的，在他们的构造函数中他们就通过传入参数绑定了彼此，这种互相绑定就可以是他们作为彼此的成员，互相调用，简化了好多操作。
+
+
+
+#### **2021/12/31版本：**
+
+这个版本的学习中感触很多：
+
+**1.游戏进度储存读取功能√：**
+
+​	在实现游戏进度储存的功能之前，我以前接触过的存取代码差不多要追溯到大一程设实验写文件存取的时候，当时用c语言来实现文件内容的存取，用到文件指针来操控存取位置，还要按照一定格式来存字符串，读，拆分字符串。总之非常麻烦。
+
+​	但在保存游戏进度的时候，用到java中的序列化，使得游戏全局的保存非常简单。java序列化的使用，只需要将需要序列化的类以及类中的成员类都实现Serializable接口，在进行类似下方的IO操作即可实现序列化：
+
+```java
+public void save()throws Exception
+	{
+		FileOutputStream fos=new FileOutputStream("save.ser");
+		ObjectOutputStream oos=new ObjectOutputStream(fos);
+
+		//开始序列化
+		PlayScreen tmp=new PlayScreen(world,player,screenWidth,screenHeight,messages,score,level,iswin,ispause);
+		oos.writeObject(tmp);
+		oos.close();
+
+	}
+```
+
+反序列化也非常简便：
+
+```java
+public Screen loadsave() throws Exception
+    {
+        FileInputStream fis=new FileInputStream("save.ser");
+        ObjectInputStream ois=new ObjectInputStream(fis);
+
+        //读取
+        PlayScreen sc= (PlayScreen)ois.readObject();
+        ois.close();
+        //System.out.println(sc.toString());
+        return sc;
+    }
+```
+
+在我的代码中，是将整个PlayScreen保存，里面包含了角色信息，世界信息，游戏状态信息等等，在点击保存按钮时，调用序列化代码，在读取时将存储文件反序列化即可实现游戏进度的保存和继续。
+
+**2.代码测试√：**
+
+如果要想实现java项目的测试，那么需要用到第三方测试工具，在本项目中我选择了Junit。我在网站上下载了正确版本的junit.jar与hamcrest-core.jar,并且导入到了我的工程中，只需要编写测试代码对于各个类进行测试即可。比如我暂时编写了三个重要类的测试：
+
+<img src="C:\Users\huawei\AppData\Roaming\Typora\typora-user-images\image-20211224220935180.png" alt="image-20211224220935180" style="zoom:50%;" />
+
+```java
+//在测试中before用于在测试前初始化一些类别，用expected来测异常，timeout来测性能。
+//在World的测试中，对空位加入物品的算法进行正确性验证
+public class WorldTest {
+    World sample;
+    Items a;
+    @Before
+    public void init()
+    {
+        sample=new WorldBuilder(5, 5).makeCaves().build();
+        a=Items.GOURD;
+    }
+    @Test
+    public void test1()
+    {
+        sample.addAtEmptyLocation(a);
+        for(int i=0;i<5;i++)
+        {
+            for(int j=0;j<5;j++)
+            {
+                if(sample.item(i, j)!=null)
+                {
+                    assertSame(a, sample.item(i, j));
+                }
+            }
+        }
+    }
+}
+......
+//比如此处测试构建世界函数的性能：
+@Test(timeout = 1000)
+	public void test0()
+	{
+    	//smooth函数的超时测试
+    	sample=new WorldBuilder(5,5);
+	}
+......
+//此处来测试存save函数在路径错误时会不会抛出正确的异常。
+@Test(expected = Exception.class)
+    public void test1()throws Exception
+    {
+        sample.save("wrong path");
+    }
+```
+
+**3.游戏联机功能：**
+
+​	实现联机功能，写client，server端，其实看了很多遍老师的课件也一点不懂。这种东西必须靠上网搜一些实践教学，在写代码的过程中一点点悟。所以我在B站看了许多java网络编程的视频。大多涉及到一个网络聊天室的例子，网络聊天室要编写client，server端互相发送信息，多人联机server端还要实现负责更新全体状态等功能。在学习后，我对我游戏的联机想法是：
+
+```
+Client
+
+Server
+```
+
+
 
 
 ## 四、主要类的介绍（待完善）

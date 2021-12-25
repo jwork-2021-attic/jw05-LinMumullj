@@ -3,7 +3,11 @@ package myruguelike;
 import myruguelike.screens.PlayScreen;
 
 public class EBatAi extends CreatureAi {
-	private Creature player;
+	/**
+     *
+     */
+    private static final long serialVersionUID = -4729882164183352861L;
+    private Creature player;
 	
 	public EBatAi(Creature creature, Creature player, PlayScreen plsc) {
 		super(creature,plsc);

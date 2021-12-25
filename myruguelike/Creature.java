@@ -1,10 +1,15 @@
 package myruguelike;
 
 import java.awt.Color;
+import java.io.Serializable;
 
 import myruguelike.screens.PlayScreen;
 
-public class Creature {
+public class Creature implements Serializable{
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 1L;
 	public World world;
 	public PlayScreen playscreen;
 	public int x;

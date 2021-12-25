@@ -10,7 +10,15 @@ import myruguelike.CreatureFactory;
 import myruguelike.World;
 import myruguelike.WorldBuilder;
 
-public class PlayScreen implements Screen {
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
+public class PlayScreen implements Screen,Serializable {
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 1L;
 	private World world;
 	private Creature player;
 	private int screenWidth;
@@ -33,7 +41,32 @@ public class PlayScreen implements Screen {
 		CreatureFactory creatureFactory = new CreatureFactory(world);
 		createCreatures(creatureFactory);
 	}
-	
+	public PlayScreen(World world,Creature player,int screenWidth,int screenHeight,List<String> messages,int score,int level,boolean iswin,boolean ispause){
+		this.score=score;
+		this.level=level;
+		this.screenWidth = screenWidth;
+		this.screenHeight = screenHeight;
+		this.iswin=iswin;
+		this.ispause=ispause;
+		this.messages = messages;
+		this.world=world;
+		this.player=player;
+	}
+
+	public PlayScreen(PlayScreen tmp){
+		score=tmp.score;
+		level=tmp.level;
+		screenWidth = tmp.screenWidth;
+		screenHeight = tmp.screenHeight;
+		iswin=tmp.iswin;
+		ispause=tmp.ispause;
+		messages = tmp.messages;
+		world=tmp.world;
+		player=tmp.player;
+		//未改动的：
+		CreatureFactory creatureFactory = new CreatureFactory(world);
+		createCreatures(creatureFactory);
+	}
 	private void createCreatures(CreatureFactory creatureFactory){
 		player = creatureFactory.newPlayer(messages,this);  //将消息列表传递给playerAI
 		
@@ -67,7 +100,7 @@ public class PlayScreen implements Screen {
 		displayTiles(terminal, left, top);
 		displayMessages(terminal, messages);
 		
-		terminal.writeCenter("-- press [Esc] to back --", 26);
+		terminal.writeCenter("-- press [Esc] to back press [S] to save--", 26);
 
 		String stats = String.format("HP: %3d/%3d", player.hp(), player.maxHp());
 		if(player.hp()>70)
@@ -119,11 +152,35 @@ public class PlayScreen implements Screen {
 		}
 	}
 	
+	public void save()throws Exception
+	{
+		FileOutputStream fos=new FileOutputStream("save.ser");
+		ObjectOutputStream oos=new ObjectOutputStream(fos);
+
+		//开始序列化
+		PlayScreen tmp=new PlayScreen(world,player,screenWidth,screenHeight,messages,score,level,iswin,ispause);
+		oos.writeObject(tmp);
+		oos.close();
+
+	}
+	public void save(String path)throws Exception
+	{
+		throw new Exception("sth wrong");
+
+	}
 	@Override
-	public Screen respondToUserInput(KeyEvent key) {
+	public Screen respondToUserInput(KeyEvent key){
 		switch (key.getKeyCode()){
 		case KeyEvent.VK_ESCAPE: return new StartScreen();
-		
+		case KeyEvent.VK_S: 
+		{
+			try {
+				save();
+				System.out.println("Success");
+			} catch (Exception e) {
+				return this;
+			}
+		}
 		case KeyEvent.VK_UP:player.moveBy( 0,-1); break;
 		case KeyEvent.VK_DOWN:player.moveBy( 0, 1); break;
 		case KeyEvent.VK_LEFT:player.moveBy(-1, 0); break;

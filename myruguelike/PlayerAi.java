@@ -6,6 +6,10 @@ import myruguelike.screens.PlayScreen;
 
 public class PlayerAi extends CreatureAi {
 
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = -1828688607381570757L;
 	private List<String> messages;
 	
 	public PlayerAi(Creature creature, List<String> messages, PlayScreen plsc) {

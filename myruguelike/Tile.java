@@ -2,10 +2,9 @@ package myruguelike;
 
 import java.awt.Color;
 import java.util.Random;
-
 import asciiPanel.AsciiPanel;
 
-public enum Tile {
+public enum Tile{
 	// FLOOR((char)250, AsciiPanel.yellow),
 	// WALL((char)177, AsciiPanel.red),
 	FLOOR((char)249, AsciiPanel.yellow),

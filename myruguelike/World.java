@@ -1,10 +1,15 @@
 package myruguelike;
 
 import java.awt.Color;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class World {
+public class World implements Serializable{
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 1L;
 	private Tile[][] tiles;
 	private int width;
 	public int width() { return width; }

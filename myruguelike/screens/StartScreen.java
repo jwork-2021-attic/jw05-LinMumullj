@@ -17,7 +17,7 @@ public class StartScreen implements Screen {
         terminal.write((char)2,43,10,AsciiPanel.brightCyan);
         terminal.write((char)2,46,10,AsciiPanel.brightBlue);
         terminal.write((char)2,49,10,AsciiPanel.brightMagenta);
-		terminal.writeCenter("-- press [enter] to start / [B] to view the handbook / [Esc] to quit --", 26);
+		terminal.writeCenter("--press[enter] to start/[B] to handbook/[Esc] to quit/[L] to continue--", 26);
 	}
 
 	@Override
@@ -28,6 +28,8 @@ public class StartScreen implements Screen {
             return new PlayScreen();
             case KeyEvent.VK_B:
             return new TipScreen();
+            case KeyEvent.VK_L:
+            return new LoadScreen();
             case KeyEvent.VK_ESCAPE:
             return null;
             default:

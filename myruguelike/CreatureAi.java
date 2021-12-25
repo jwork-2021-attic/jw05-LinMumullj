@@ -1,8 +1,12 @@
 package myruguelike;
 
 import myruguelike.screens.PlayScreen;
-
-public class CreatureAi implements Runnable{
+import java.io.Serializable;
+public class CreatureAi implements Runnable,Serializable{
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 1L;
 	protected Creature creature;
 	PlayScreen playscreen;
 	public CreatureAi(Creature creature,PlayScreen plsc){

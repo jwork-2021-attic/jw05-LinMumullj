@@ -2,7 +2,7 @@ package myruguelike;
 import java.awt.Color;
 import asciiPanel.AsciiPanel;
 import myruguelike.screens.PlayScreen;
-public enum Items {
+public enum Items{
 	HEART((char)3, AsciiPanel.brightGreen, "heart" ,10),
 	GOURD((char)2, AsciiPanel.brightBlue, "gourd1" ,10);
 
